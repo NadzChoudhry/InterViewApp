@@ -79,53 +79,57 @@ namespace NadzFxStreetWeApi.Controllers
         {
             try
             {
-                if (dto.houseTeam.Count != 11 || dto.awayTeam.Count != 11)
+                if (!(dto.houseTeam.Count == 11 && dto.awayTeam.Count == 11))
                 {
                     return BadRequest();
                 }
-                var newM = new Match()
+                else
                 {
-                    Name = dto.name,
-                    HouseTeamManager = this._repositoryManager.GetManagerById(dto.houseManager),
-                    AwayTeamManager = this._repositoryManager.GetManagerById(dto.awayManger),
-                    Referee = this._repositoryreferee.GetRefereeById(dto.referee),
-                    Date = DateTimeOffset.Now,
-                    HouseTeamPlayers = new List<PlayersOfMatch>(),
-                    AwayTeamPlayers = new List<PlayersOfMatch>()
-                };
-
-
-                dto.houseTeam.ForEach(id =>
-                {
-                    var p = this._repositoryPlayer.GetPlayerById(id);
-                    if (p != null)
+                    var newM = new Match()
                     {
-                        newM.HouseTeamPlayers.Add(new PlayersOfMatch()
-                        {
-                            Home = true,
-                            Player = p,
-                            PlayerId = p.Id
-                        });
-                    }
-                });
+                        Name = dto.name,
+                        HouseTeamManager = this._repositoryManager.GetManagerById(dto.houseManager),
+                        AwayTeamManager = this._repositoryManager.GetManagerById(dto.awayManger),
+                        Referee = this._repositoryreferee.GetRefereeById(dto.referee),
+                        Date = DateTimeOffset.Now,
+                        HouseTeamPlayers = new List<PlayersOfMatch>(),
+                        AwayTeamPlayers = new List<PlayersOfMatch>()
+                    };
 
-                dto.awayTeam.ForEach(id =>
-                {
-                    var p = this._repositoryPlayer.GetPlayerById(id);
-                    if (p != null)
+
+                    dto.houseTeam.ForEach(id =>
                     {
-                        newM.AwayTeamPlayers.Add(new PlayersOfMatch()
+                        var p = this._repositoryPlayer.GetPlayerById(id);
+                        if (p != null)
                         {
-                            Home = false,
-                            Player = p,
-                            PlayerId = p.Id
-                        });
-                    }
-                });
+                            newM.HouseTeamPlayers.Add(new PlayersOfMatch()
+                            {
+                                Home = true,
+                                Player = p,
+                                PlayerId = p.Id
+                            });
+                        }
+                    });
 
-                this._repository.Add(newM);
+                    dto.awayTeam.ForEach(id =>
+                    {
+                        var p = this._repositoryPlayer.GetPlayerById(id);
+                        if (p != null)
+                        {
+                            newM.AwayTeamPlayers.Add(new PlayersOfMatch()
+                            {
+                                Home = false,
+                                Player = p,
+                                PlayerId = p.Id
+                            });
+                        }
+                    });
 
-                return Created(" POST: api/Match", newM.Id);
+                    this._repository.Add(newM);
+
+                    return Created(" POST: api/Match", newM.Id);
+                }
+
             }
             catch (Exception exp)
             {
